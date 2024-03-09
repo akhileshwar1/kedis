@@ -5,12 +5,16 @@ class KMapString{
 
   private HashMap<String, String> kMapString;
 
-  private String set(String key, String value){
+  public KMapString(){
+    kMapString = new HashMap<>();
+  }
+
+  public String set(String key, String value){
     kMapString.put(key, value);
     return "OK";
   }
 
-  private String get(String key){
+  public String get(String key){
     if(kMapString.containsKey(key)){
       return kMapString.get(key);
     }
@@ -19,7 +23,7 @@ class KMapString{
     }
   }
 
-  private String incrBy(String key, Integer value){
+  public String incrBy(String key, Integer value){
     if(kMapString.containsKey(key)){
       
      long currValue = Long.parseLong(kMapString.get(key));
