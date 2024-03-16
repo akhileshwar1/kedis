@@ -1,7 +1,7 @@
 package com.kandi.kedis;
 import java.util.HashMap;
 
-class KMapString{
+class KMapString implements KMap{
 
   private HashMap<String, String> kMapString;
 
@@ -9,11 +9,13 @@ class KMapString{
     kMapString = new HashMap<>();
   }
 
+  @Override
   public String set(String key, String value){
     kMapString.put(key, value);
     return "OK";
   }
 
+  @Override
   public String get(String key){
     if(kMapString.containsKey(key)){
       return kMapString.get(key);
@@ -23,7 +25,8 @@ class KMapString{
     }
   }
 
-  public String incrBy(String key, Integer value){
+  @Override
+  public String incrBy(String key, int value){
     if(kMapString.containsKey(key)){
       
      long currValue = Long.parseLong(kMapString.get(key));

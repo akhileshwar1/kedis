@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class KMapList{
+class KMapList implements KMap {
 
   private HashMap<String, ArrayList<String>> kMapList;
 
@@ -18,7 +18,8 @@ class KMapList{
     return String.join(",", list);
   }
 
-  public String LINDEX(String key, int index){
+  @Override
+  public String get(String key, int index){
     if(kMapList.containsKey(key)){
       List<String> lst = kMapList.get(key);
       if(index<lst.size()){
@@ -32,7 +33,8 @@ class KMapList{
     }
   }
 
-  public String LSET(String key, int index, String value){
+  @Override
+  public String set(String key, int index, String value){
     if(kMapList.containsKey(key)){
       List<String> lst = kMapList.get(key);
         lst.add(index, value); 
