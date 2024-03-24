@@ -10,13 +10,16 @@ class KMap{
     kMap = new HashMap<>();
   }
 
-  public String set(String key, String value){
+  public synchronized String set(String key, String value){
+        System.out.println("Thread " + Thread.currentThread().getId() + " entering set method.");
     KType data = new KType(value);
     kMap.put(key, data);
+        System.out.println("Thread " + Thread.currentThread().getId() + " exiting set method.");
     return "OK";
   }
 
-  public String get(String key){
+  public synchronized String get(String key){
+        System.out.println("Thread " + Thread.currentThread().getId() + " entering get method.");
     if(!kMap.containsKey(key)){
       return "KEY NOT FOUND";
     }
@@ -27,10 +30,11 @@ class KMap{
       return "INVALID COMMAND FOR TYPE";
     }
 
+        System.out.println("Thread " + Thread.currentThread().getId() + " exiting get method.");
     return data.str;
   }
 
-  public String incrBy(String key, int value){
+  public synchronized String incrBy(String key, int value){
     if(!kMap.containsKey(key)){
       // create it. 
       KType data = new KType(String.valueOf(value));
@@ -53,7 +57,7 @@ class KMap{
   }
 
   // LIST FUNCTIONS.
-  public String LAdd(String key, String... moreArgs){
+  public synchronized String LAdd(String key, String... moreArgs){
     ArrayList<String> list = new ArrayList<>();
     for(String str : moreArgs){
       list.add(str);
@@ -64,7 +68,7 @@ class KMap{
     return String.join(",", list);
   }
 
-  public String set(String key, int index, String value){
+  public synchronized String set(String key, int index, String value){
     if(!kMap.containsKey(key)){
       return "KEY NOT PRESENT";
     }
@@ -79,7 +83,7 @@ class KMap{
     return "OK";
   }
 
-  public String get(String key, int index){
+  public synchronized String get(String key, int index){
     if(!kMap.containsKey(key)){
       return "KEY NOT PRESENT";
     }
