@@ -57,7 +57,7 @@ class KMap{
   }
 
   // LIST FUNCTIONS.
-  public synchronized String LAdd(String key, String... moreArgs){
+  public synchronized String lAdd(String key, String... moreArgs){
     ArrayList<String> list = new ArrayList<>();
     for(String str : moreArgs){
       list.add(str);
@@ -68,7 +68,7 @@ class KMap{
     return String.join(",", list);
   }
 
-  public synchronized String set(String key, int index, String value){
+  public synchronized String lSet(String key, int index, String value){
     if(!kMap.containsKey(key)){
       return "KEY NOT PRESENT";
     }
@@ -83,7 +83,7 @@ class KMap{
     return "OK";
   }
 
-  public synchronized String get(String key, int index){
+  public synchronized String lGet(String key, int index){
     if(!kMap.containsKey(key)){
       return "KEY NOT PRESENT";
     }
