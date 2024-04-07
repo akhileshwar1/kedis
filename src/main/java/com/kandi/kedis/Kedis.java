@@ -1,64 +1,87 @@
 package com.kandi.kedis;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// A wrapper over kmap that provides an interface that takes in a command.
+// A wrapper over kmap that handles loading and dispatching of commands.
+// Any new command has to be loaded and mapped here.
 class Kedis{
   private KMap kMap;
+
+  // hashmap of command type: list of arg-types.
+  // Example: SET: {String, String}
+  private Map<String, String[]> commandTypes;
+
   public Kedis(){
     this.kMap = new KMap();
+    this.commandTypes = new HashMap<>();
+    //load the hashmap with kedis commands.
+    this.commandTypes.put("SET", new String[]{"String", "String"});
+    this.commandTypes.put("GET", new String[]{"String"});
+    this.commandTypes.put("LADD", new String[]{"NA"});
+    this.commandTypes.put("LSET", new String[]{"String", "int", "String"});
+    this.commandTypes.put("LGET", new String[]{"String", "int"});
   }
 
-  public String runCommand(String str){
-    String[] words = str.split(" ");
-      int len = words.length;
-      String type = words[0];
-      if(type.equals("SET") && len == 3){
-        String key = words[1];
-        String value = words[2];
-        return kMap.set(key, value);
+  public String processCommand(String commandLine) {
+    String[] words = commandLine.split(" ");
+    if (words.length == 0) {
+      return "INVALID COMMAND";
+    }
+
+    String command = words[0].toUpperCase();
+    if (!commandTypes.containsKey(command)) {
+      return "INVALID COMMAND TYPE";
+    }
+
+    String[] expectedTypes = commandTypes.get(command);
+    if (!expectedTypes[0].equals("NA") && words.length - 1 != expectedTypes.length) {
+      return "INCORRECT NO OF ARGS TO THE COMMAND";
+    }
+
+    for(int i = 0; i< expectedTypes.length; i++){
+      if(expectedTypes[i].equals("NA")){
+        break;
       }
-      else if(type.equals("LSET") && len == 4){
-        String key = words[1];
-        String index = words[2];
-        String value = words[3];
+
+      else if(expectedTypes[i].equals("int")){
+        String index = words[i + 1];
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(index);
         if(matcher.matches()){
-          return kMap.lSet(key, Integer.parseInt(index), value);
+          continue;
         }
         else{
           return "INDEX NOT AN INTEGER";
         }
       }
-      else if(type.equals("GET") && len == 2){
-        String key = words[1];
-        return kMap.get(key);
+    }
+
+    // Invoke the corresponding method
+    switch (command) {
+      case "SET":
+      return kMap.set(words[1], words[2]);
+
+      case "GET":
+      return kMap.get(words[1]);
+
+      case "LADD":
+      String key = words[1];
+      String[] values = new String[words.length - 2];
+      for(int i = 2; i< words.length; i++){
+        values[i - 2] = words[i];
       }
-      else if(type.equals("LGET") && len == 3){
-        String key = words[1];
-        String index = words[2];
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(index);
-        if(matcher.matches()){
-          return kMap.lGet(key, Integer.parseInt(index));
-        }
-        else{
-          return "INDEX NOT AN INTEGER";
-        }
-      }
-      else if(type.equals("LADD")){
-        String key = words[1];
-        String[] values = new String[len - 2];
-        for(int i = 2; i< len; i++){
-          values[i - 2] = words[i];
-        }
-        return kMap.lAdd(key, values);
-      }
-    else{
-      return "NOT A VALID COMMAND";
+      return kMap.lAdd(key, values);
+
+      case "LSET":
+      return kMap.lSet(words[1], Integer.parseInt(words[2]), words[3]);
+
+      case "LGET":
+      return kMap.lGet(words[1], Integer.parseInt(words[2]));
+
+      default:
+      return "SERVER DOWN";
     }
   }
-
-
 }
